@@ -23,10 +23,10 @@ jobs:
         run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
       - name: Build the Docker Image
-        run: docker build -t prudhvigopasina1999/nodeTestAppGCP .
+        run: docker build -t prudhvigopasina1999/nodetestappgcp .
 
       - name: Push to DockerHub
-        run: docker push prudhvigopasina1999/nodeTestAppGCP
+        run: docker push prudhvigopasina1999/nodetestappgcp
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy node-gcp-app \
-            --image prudhvigopasina1999/nodeTestAppGCP:$GITHUB_SHA \
+            --image prudhvigopasina1999/nodetestappgcp:$GITHUB_SHA \
             --platform managed \
             --region ${{ secrets.GCP_REGION }} \
             --allow-unauthenticated

@@ -13,25 +13,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+      - name: Login to DockerHub
+        env:
+          DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+      - name: Build the Docker Image
+        run: docker build -t prudhvigopasina1999/nodetestappgcp:$GITHUB_SHA .
 
-      - name: Configure Docker to use gcloud as a credential helper
-        run: gcloud auth configure-docker
-
-      - name: Build Docker image
-        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/nodetestappgcp:$GITHUB_SHA .
-
-      - name: Push Docker image to GCR
-        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/nodetestappgcp:$GITHUB_SHA
+      - name: Push to DockerHub
+        run: docker push prudhvigopasina1999/nodetestappgcp:$GITHUB_SHA
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,10 +38,13 @@ jobs:
         with:
           credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 
+      - name: Configure Docker to use gcloud as a credential helper
+        run: gcloud auth configure-docker
+
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy node-gcp-app \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/nodetestappgcp:$GITHUB_SHA \
+            --image prudhvigopasina1999/nodetestappgcp:$GITHUB_SHA \
             --platform managed \
             --region ${{ secrets.GCP_REGION }} \
             --allow-unauthenticated

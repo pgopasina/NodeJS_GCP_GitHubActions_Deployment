@@ -43,7 +43,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy nodejs_cloudrun_deploy \
+          gcloud run deploy nodejscloudrundeploy \
             --image prudhvigopasina1999/nodeappcloudrun:$GITHUB_SHA \
             --platform managed \
             --region ${{ secrets.GCP_REGION }} \
